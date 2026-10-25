@@ -1,0 +1,215 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+@section scripts
+{
+    <script>
+$(document).ready(function () {
+mostrarPedidos();
+});
+function mostrarPedidos() {
+var url = "http://wamensajeria.azurewebsites.net/api/mensajeria";
+
+$.getJSON(url, function (data) {
+$("#contenido").html("");
+$.each(data, function (p, pedidos) {
+var item = "";
+item += "<tr>";
+item += "<td>" + pedidos.ID_PEDIDO + "</td>";
+item += "<td>" + pedidos.ESTADO_ENTREGA + "</td>";
+item += "<td>" + pedidos.FECHA_CREACION + "</td>";
+item += "<td>" + pedidos.DESTINATARIO + "</td>";
+item += "<td>" + pedidos.DIRECCION + "</td>";
+item += "<td>" + pedidos.CODIGO_POSTAL + "</td>";
+item += "<td>" + pedidos.TELEFONO + "</td>";
+item += "<td>" + pedidos.ID_MENSAJERO + "</td>";
+item += "</tr>";
+$("#contenido").append(item);
+});
+});
+}
+$("#btncrear").click(function () {
+var url = "http://wamensajeria.azurewebsites.net/api/mensajeria";
+
+var p = new Object();
+p.ID_PEDIDO = $("#txtidpedido").val();
+p.ESTADO_ENTREGA = $("#txtestadoentrega").val();
+p.FECHA_CREACION = $("#txtfechacreacipn").val();
+p.DESTINATARIO = $("#txtdestinatario").val();
+p.DIRECCION = $("#txtdireccion").val();
+p.CODIGO_POSTAL = $("#txtcodigopostal").val();
+p.TELEFONO = $("#txttelefono").val();
+p.ID_MENSAJERO = $("#txtidmensajero").val();
+
+$.ajax({
+url: url,
+type : "POST",
+contentType: "application/json",
+data: JSON.stringify(p),
+success: function (data) {
+mostrarPedidos();
+$("#mensaje").text("Pedido creado satisfactoriamente.");
+}, error: function (msj) {
+$("#mensaje").text("Error, no se ha podido crear el pedido.");
+}
+})
+})
+
+$("#btnmodificar").click(function () {
+var num = $("#txtidpedido").val();
+var url = "http://wamensajeria.azurewebsites.net/api/mensajeria/" + num;
+
+var p = new Object();
+p.ID_PEDIDO = $("#txtidpedido").val();
+p.ESTADO_ENTREGA = $("#txtestadoentrega").val();
+p.FECHA_CREACION = $("#txtfechacreacipn").val();
+p.DESTINATARIO = $("#txtdestinatario").val();
+p.DIRECCION = $("#txtdireccion").val();
+p.CODIGO_POSTAL = $("#txtcodigopostal").val();
+p.TELEFONO = $("#txttelefono").val();
+p.ID_MENSAJERO = $("#txtidmensajero").val();
+
+$.ajax({
+url: url,
+type: "PUT",
+contentType: "application/json",
+data: JSON.stringify(p),
+success: function (data) {
+mostrarPedidos();
+$("#mensaje").text("Pedido modificado satisfactoriamente.");
+}, error: function (msj) {
+$("#mensaje").text("Error, no se ha podido modificar el pedido.");
+}
+})
+})
+
+$("#btneliminar").click(function () {
+var num = $("#txtidpedido").val();
+var url = "http://wamensajeria.azurewebsites.net/api/mensajeria/" + num;
+
+$.ajax({
+url: url,
+type: "DELETE",
+contentType: "application/json",
+success: function (data) {
+mostrarPedidos();
+$("#mensaje").text("Pedido eliminado satisfactoriamente.");
+}, error: function (msj) {
+$("#mensaje").text("Error, no se ha podido eliminar el pedido.");
+}
+})
+})
+
+$("#btnrecuperar").click(function () {
+var num = $("#txtidpedido").val();
+var url = "http://wamensajeria.azurewebsites.net/api/mensajeria/" + num;
+
+$.ajax({
+url: url,
+type: "GET",
+contentType: "application/json",
+success: function (data) {
+$("#txtestadoentrega").val(data.ESTADO_ENTREGA);
+$("#txtfechacreacipn").val(data.FECHA_CREACION);
+$("#txtdestinatario").val(data.DESTINATARIO);
+$("#txtdireccion").val(data.DIRECCION);
+$("#txtcodigopostal").val(data.CODIGO_POSTAL);
+$("#txttelefono").val(data.TELEFONO);
+$("#txtidmensajero").val(data.ID_MENSAJERO);
+
+$("#mensaje").text("Datos recuperados satisfactoriamente.");
+}, error: function (msj) {
+$("#mensaje").text("Error, no se ha podido recuperar los datos del pedido.");
+}
+})
+
+//$.getJSON(url, function (data) {
+// $("#contenido").html("");
+// $.each(data, function (p, pedidos) {
+// var item = "";
+// item += "<tr>";
+// item += "<td>" + pedidos.ID_PEDIDO + "</td>";
+// item += "<td>" + pedidos.ESTADO_ENTREGA + "</td>";
+// item += "<td>" + pedidos.FECHA_CREACION + "</td>";
+// item += "<td>" + pedidos.DESTINATARIO + "</td>";
+// item += "<td>" + pedidos.DIRECCION + "</td>";
+// item += "<td>" + pedidos.CODIGO_POSTAL + "</td>";
+// item += "<td>" + pedidos.TELEFONO + "</td>";
+// item += "<td>" + pedidos.ID_MENSAJERO + "</td>";
+// item += "</tr>";
+// $("#contenido").append(item);
+// });
+//});
+})
+    </script>
+}
+
+<h2>Todos los pedidos</h2>
+
+<table id="tabla" class="table-bordered table-hover">
+    <tread>
+        <tr>
+            <th>ID pedido</th>
+            <th>Estado de entrega</th>
+            <th>Fecha de creación</th>
+            <th>Destinatario</th>
+            <th>Dirección</th>
+            <th>Código postal</th>
+            <th>Teléfono</th>
+            <th>Id mensajero</th>
+        </tr>
+    </tread>
+    <tbody id="contenido"></tbody>
+</table>
+
+<hr />
+<h2>Administrar pedidos</h2>
+
+<div>
+    <label>ID pedido:</label>
+    <input type="text" id="txtidpedido" class="form-control" />
+</div>
+<div>
+    <label>Estado entrega:</label>
+    <select id="txtestadoentrega" class="form-control">
+        <option value="PENDIENTE">PENDIENTE</option>
+        <option value="ENTREGADO">ENTREGADO</option>
+        <option value="INCIDENCIA">INCIDENCIA</option>
+    </select>
+
+    <label>Fecha creación:</label>
+    <input type="text" id="txtfechacreacipn" class="form-control" />
+
+    <label>Destinatario:</label>
+    <input type="text" id="txtdestinatario" class="form-control" />
+</div>
+<div>
+    <label>Dirección:</label>
+    <input type="text" id="txtdireccion" class="form-control" />
+
+    <label>Código postal:</label>
+    <input type="text" id="txtcodigopostal" class="form-control" />
+
+    <label>Teléfono:</label>
+    <input type="text" id="txttelefono" class="form-control" />
+</div>
+<div>
+    <label>ID mensajero:</label>
+    <select id="txtidmensajero" class="form-control">
+        <option value="1″>1</option>
+        <option value="2″>2</option>
+        <option value="3″>3</option>
+        <option value="4″>4</option>
+        <option value="5″>5</option>
+        <option value="6″>6</option>
+        <option value="7″>7</option>
+        <option value="8″>8</option>
+    </select>
+</div>
+
+<button id="btnrecuperar" class="btn-success">Recuperar campos</button>
+<button id="btncrear" class="btn-primary">Crear</button>
+<button id="btnmodificar" class="btn-warning">Modificar</button>
+<button id="btneliminar" class="btn-danger">Eliminar</button>
+<h5 style="color:blue" id="mensaje"></h5>
